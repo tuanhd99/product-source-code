@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Config
+yarn-error.log
+pnpm-lock.yaml
+dist
+.vscode
+package-lock.json

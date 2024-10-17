@@ -1,30 +1,42 @@
-import { User } from "auth/models";
-import { createContext, useState } from "react";
-import { getFromLocalStorage } from "utils/function";
+import React, { Suspense } from "react";
+import { useRoutes } from "react-router-dom";
+import LoadingArea from "src/common/loading/LoadingArea";
+import LoginLayout from "src/layouts/LoginLayout/LoginLayout";
+import { RouterPath } from "./utils";
 
-interface IAppContext {
-  isAuthenticated: boolean;
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-  profile: User | null;
-  setProfile: React.Dispatch<React.SetStateAction<User | null>>;
+const Login = React.lazy(() => import("src/pages/Login"));
+const Register = React.lazy(() => import("src/pages/Register"));
+
+export default function useRounteElement() {
+  const routeElement = useRoutes([
+    {
+      path: RouterPath.Login,
+      element: <LoginLayout />,
+      children: [
+        {
+          index: true,
+          element: (
+            <Suspense fallback={<LoadingArea />}>
+              <Login />
+            </Suspense>
+          )
+        }
+      ]
+    },
+    {
+      path: RouterPath.Register,
+      element: <LoginLayout />,
+      children: [
+        {
+          index: true,
+          element: (
+            <Suspense fallback={<LoadingArea />}>
+              <Register />
+            </Suspense>
+          )
+        }
+      ]
+    }
+  ]);
+  return routeElement;
 }
-const InittialValue: IAppContext = {
-  isAuthenticated: Boolean(getFromLocalStorage("access_token")),
-  setIsAuthenticated: () => null,
-  profile: null,
-  setProfile: () => null
-};
-export const AppContext = createContext<IAppContext>(InittialValue);
-
-function AppProvide({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(InittialValue.isAuthenticated);
-  const [profile, setProfile] = useState<User | null>(InittialValue.profile);
-
-  return (
-    <AppContext.Provider value={{ isAuthenticated, setIsAuthenticated, profile, setProfile }}>
-      {children}
-    </AppContext.Provider>
-  );
-}
-
-export default AppProvide;

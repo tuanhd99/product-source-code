@@ -1,5 +1,5 @@
 export enum RouterPath {
-  Index = '/',
-  Login = '/login',
-  Register = '/register'
+  Index = "/",
+  Login = "/login",
+  Register = "/register"
 }
