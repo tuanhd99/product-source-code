@@ -2,7 +2,6 @@
 using Authentication.Dtos;
 using Authentication.Kit.Service.APIResponse;
 using Authentication.Kit.Service.Exceptions;
-using Authentication.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -59,7 +58,6 @@ namespace Authentication.Controllers
 
 
         [HttpPost("login")]
-
         public async Task<string> Login([FromBody] UserLoginDto userLoginDto)
         {
             if (!ModelState.IsValid)
@@ -81,9 +79,9 @@ namespace Authentication.Controllers
             return jwtToken;
         }
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
+        public async Task<bool> Logout()
         {
-            return Ok(new AuthResult { Result = true, Message = "Successfully logged out" });
+            return true;
         }
 
         private string GenerateJwtToken(IdentityUser user)
