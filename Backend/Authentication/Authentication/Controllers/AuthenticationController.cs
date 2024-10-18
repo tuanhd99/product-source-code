@@ -1,7 +1,8 @@
 ﻿using Authentication.Data;
 using Authentication.Dtos;
+using Authentication.Kit.Service.APIResponse;
+using Authentication.Kit.Service.Exceptions;
 using Authentication.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -11,9 +12,9 @@ using System.Text;
 
 namespace Authentication.Controllers
 {
+
     [Route("api/[controller]")]
-    [ApiController]
-    public class AuthenticationController : ControllerBase
+    public class AuthenticationController : APIBaseController
     {
         private AppDbContext _context { get; set; }
         private readonly UserManager<IdentityUser> _userManager;
@@ -25,92 +26,66 @@ namespace Authentication.Controllers
             _configuration = configuration;
         }
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UserRegisterDto requestDto)
+        public async Task<string> Register([FromBody] UserRegisterDto requestDto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user_exist = await _userManager.FindByEmailAsync(requestDto.Email);
-                if (user_exist != null)
-                {
-                    return BadRequest(new AuthResult()
-                    {
-                        Errors = new List<string>() { "Email already exist" },
-                        Result = false
-                    });
-                }
-                // Create a user
-
-                var new_user = new IdentityUser()
-                {
-                    Email = requestDto.Email,
-                    UserName = requestDto.Email
-                };
-               var is_created = await _userManager.CreateAsync(new_user,requestDto.Password);
-                if (is_created.Succeeded)
-                {
-                    //Create token
-                    var token = GenerateJwtToken(new_user);
-                    return Ok(new AuthResult()
-                    {
-                        Result = true,
-                        Token = token,
-                        Message = "Successfully logged in"
-                    });        
-                }
-                return BadRequest(new AuthResult()
-                {
-                    Errors = new List<string>() {
-                        "Server error"
-                    },
-                    Result = false
-
-                });
+                throw new EntityNotFoundException("Invalid request data");
             }
-            return BadRequest();
+            var user_exist = await _userManager.FindByEmailAsync(requestDto.Email);
+            if (user_exist != null)
+            {
+                throw new EntityNotFoundException("Email already exists");
+            }
+
+            var new_user = new IdentityUser
+            {
+                Email = requestDto.Email,
+                UserName = requestDto.Email
+            };
+            string tokenresponse = string.Empty;
+
+            var is_created = await _userManager.CreateAsync(new_user, requestDto.Password);
+            if (is_created.Succeeded)
+            {
+                tokenresponse = GenerateJwtToken(new_user);
+            }
+            else
+            {
+                throw new EntityNotFoundException("User registration failed");
+            }
+            return tokenresponse;
         }
+
 
         [HttpPost("login")]
 
-        public async Task<IActionResult> Login([FromBody] UserLoginDto userLoginDto)
+        public async Task<string> Login([FromBody] UserLoginDto userLoginDto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                // check user exist
-                var user_exist = await _userManager.FindByEmailAsync(userLoginDto.Email);
-                if (user_exist == null)
-                {
-                    return BadRequest(new AuthResult()
-                    {
-                        Errors = new List<string>() { "Invalid payload" },
-                        Result = false,
-                        Message = "An occurred login account"
-                    });
-                }
-                var isCorrect = await _userManager.CheckPasswordAsync(user_exist, userLoginDto.Password);
-                if (!isCorrect)
-                {
-                    return BadRequest(new AuthResult()
-                    {
-                        Errors = new List<string>() { "Invalid credent" },
-                        Result = false,
-                        Message = "An occurred login account"
-                    });
-                }
-                var jwtToken = GenerateJwtToken(user_exist);
-                return Ok(new AuthResult()
-                {
-                    Result = true,
-                    Token = jwtToken
-                });
+                throw new EntityNotFoundException("Invalid request data");
             }
-            return BadRequest();
+            // check user exist
+            var user_exist = await _userManager.FindByEmailAsync(userLoginDto.Email);
+            if (user_exist == null)
+            {
+                throw new EntityNotFoundException("Can not found user account");
+            }
+            var isCorrect = await _userManager.CheckPasswordAsync(user_exist, userLoginDto.Password);
+            if (!isCorrect)
+            {
+                throw new EntityNotFoundException("Invalid password or email");
+            }
+            var jwtToken = GenerateJwtToken(user_exist);
+            return jwtToken;
         }
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             return Ok(new AuthResult { Result = true, Message = "Successfully logged out" });
         }
-      
+
         private string GenerateJwtToken(IdentityUser user)
         {
             var jwtTolenHandler = new JwtSecurityTokenHandler();
@@ -131,8 +106,8 @@ namespace Authentication.Controllers
             };
             var token = jwtTolenHandler.CreateToken(tokenDescriptor);
             return jwtTolenHandler.WriteToken(token);
-             ;
+            ;
         }
-    
+
     }
 }
