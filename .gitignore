@@ -1,6 +1,4 @@
 
-
-
 # Logs
 logs
 *.log
@@ -32,3 +30,5 @@ pnpm-lock.yaml
 dist
 .vscode
 package-lock.json
+bin/
+obj/
