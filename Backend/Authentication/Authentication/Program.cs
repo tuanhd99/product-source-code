@@ -16,7 +16,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = false;
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -42,10 +46,11 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
     };
 });
-builder.Services.AddSwaggerGen(c => {
+builder.Services.AddSwaggerGen(c =>
+{
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "JWTToken_Auth_API",
+        Title = "Manage Product",
         Version = "v1"
     });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
@@ -71,7 +76,7 @@ builder.Services.AddSwaggerGen(c => {
 });
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = true; 
+    options.SignIn.RequireConfirmedAccount = true;
 })
     .AddEntityFrameworkStores<AppDbContext>();
 
@@ -98,7 +103,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowReactApp");
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

@@ -1,7 +1,33 @@
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { RouterPath } from "src/routers/utils";
-
+import { schemaLogin, SchemaLogin } from "src/utils/validate";
+import { useMutation } from "@tanstack/react-query";
+import { LoginAccount } from "src/auth/auth.API";
+import { ILogin } from "src/auth/models";
 function Login() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<SchemaLogin>({
+    resolver: yupResolver(schemaLogin)
+  });
+
+  const LoginAccountMutaion = useMutation({
+    mutationKey: ["login"],
+    mutationFn: (body: ILogin) => LoginAccount(body)
+  });
+  const onSubmit = handleSubmit((data) => {
+    console.log(data);
+    LoginAccountMutaion.mutate(data, {
+      onSuccess: (response) => {
+        const { data } = response;
+        console.log(data);
+      }
+    });
+  });
   return (
     <div className='flex items-center justify-center min-h-full'>
       <div className='bg-white rounded-lg shadow dark:border sm:max-w-md w-full md:w-[500px] xl:p-0 dark:bg-gray-800 dark:border-gray-700'>
@@ -9,18 +35,19 @@ function Login() {
           <h1 className='text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white'>
             Sign in to your account
           </h1>
-          <form className='space-y-4 md:space-y-6'>
+          <form className='space-y-4 md:space-y-6' onSubmit={onSubmit}>
             <div className='flex flex-col items-start'>
               <label htmlFor='email' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
                 Your Email
               </label>
               <input
                 type='email'
-                name='email'
                 id='email'
                 placeholder='Your Email'
                 className='bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                {...register("email")}
               />
+              <div className='mt-1 text-red-600 min-h-[1.25rem] text-sm'>{errors.email?.message}</div>
             </div>
             <div className='flex flex-col items-start'>
               <label htmlFor='password' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
@@ -28,11 +55,12 @@ function Login() {
               </label>
               <input
                 type='password'
-                name='password'
                 id='password'
                 placeholder='Password'
                 className='bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                {...register("password")}
               />
+              <div className='mt-1 text-red-600 min-h-[1.25rem] text-sm'>{errors.password?.message}</div>
             </div>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>

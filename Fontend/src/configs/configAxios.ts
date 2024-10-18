@@ -4,7 +4,7 @@ class fetHandlerAxios {
   instance: AxiosInstance;
   constructor() {
     this.instance = axios.create({
-      baseURL: "",
+      baseURL: "http://localhost:7294",
       timeout: 5000
       // headers: {
       //   "Content-Type": "application/json",
@@ -16,7 +16,7 @@ class fetHandlerAxios {
       (config) => {
         const access_token = getFromLocalStorage("access_token");
         if (access_token) {
-          config.headers.Authorization = access_token;
+          config.headers.Authorization = `Bearer ${access_token}`;
         }
         return config;
       },

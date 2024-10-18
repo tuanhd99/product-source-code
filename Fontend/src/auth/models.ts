@@ -10,3 +10,15 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface BaseResponseAPI {
+  data?: any;
+  code: number;
+  status: number;
+  message?: string;
+}
+
+export interface ILogin {
+  email: string;
+  password: string;
+}
