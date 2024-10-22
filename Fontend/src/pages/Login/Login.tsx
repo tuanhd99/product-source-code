@@ -20,7 +20,6 @@ function Login() {
     mutationFn: (body: ILogin) => LoginAccount(body)
   });
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
     LoginAccountMutaion.mutate(data, {
       onSuccess: (response) => {
         const { data } = response;
@@ -31,7 +30,7 @@ function Login() {
   return (
     <div className='flex items-center justify-center min-h-full'>
       <div className='bg-white rounded-lg shadow dark:border sm:max-w-md w-full md:w-[500px] xl:p-0 dark:bg-gray-800 dark:border-gray-700'>
-        <div className='p-6 space-y-4 md:space-y-6 sm:p-8'>
+        <div className='p-6 space-y-4 md:space-y-6 sm:p-8 border border-gray-200 rounded-lg'>
           <h1 className='text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white'>
             Sign in to your account
           </h1>

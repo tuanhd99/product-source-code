@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { useRoutes } from "react-router-dom";
+import { Navigate, useRoutes } from "react-router-dom";
 import LoadingArea from "src/common/loading/LoadingArea";
 import LoginLayout from "src/layouts/LoginLayout/LoginLayout";
 import { RouterPath } from "./utils";
@@ -9,6 +9,10 @@ const Register = React.lazy(() => import("src/pages/Register"));
 
 export default function useRounteElement() {
   const routeElement = useRoutes([
+    {
+      path: RouterPath.Index,
+      element: <Navigate to={RouterPath.Login} replace />
+    },
     {
       path: RouterPath.Login,
       element: <LoginLayout />,
