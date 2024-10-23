@@ -10,7 +10,7 @@ interface IAppContext {
   setProfile: React.Dispatch<React.SetStateAction<User | null>>;
 }
 const InittialValue: IAppContext = {
-  isAuthenticated: Boolean(getFromLocalStorage("access_token")),
+  isAuthenticated: Boolean(getFromLocalStorage("access_token")) || false,
   setIsAuthenticated: () => null,
   profile: null,
   setProfile: () => null

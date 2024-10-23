@@ -1,17 +1,31 @@
 import React, { Suspense } from "react";
-import { Navigate, useRoutes } from "react-router-dom";
+import { useRoutes } from "react-router-dom";
 import LoadingArea from "src/common/loading/LoadingArea";
 import LoginLayout from "src/layouts/LoginLayout/LoginLayout";
+import ProtectedRoute from "./ProtectedRoute";
 import { RouterPath } from "./utils";
 
 const Login = React.lazy(() => import("src/pages/Login"));
 const Register = React.lazy(() => import("src/pages/Register"));
+const Home = React.lazy(() => import("src/pages/Home"));
 
 export default function useRounteElement() {
   const routeElement = useRoutes([
     {
       path: RouterPath.Index,
-      element: <Navigate to={RouterPath.Login} replace />
+      // element: <LoginLayout />,
+      children: [
+        {
+          index: true,
+          element: (
+            <Suspense fallback={<LoadingArea />}>
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            </Suspense>
+          )
+        }
+      ]
     },
     {
       path: RouterPath.Login,

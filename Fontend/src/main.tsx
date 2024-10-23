@@ -5,7 +5,6 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import AppProvide from "./contexts/AppContext.tsx";
 import "./index.css";
-// import AppProvide from "routers/useRoute.tsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {

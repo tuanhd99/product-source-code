@@ -2,7 +2,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
 import { omit } from "lodash";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { RegisterAccount } from "src/auth/auth.API";
 import { ILogin } from "src/auth/models";
 import { RouterPath } from "src/routers/utils";
@@ -17,16 +17,23 @@ function Register() {
   } = useForm<SchemaRegister>({
     resolver: yupResolver(schemaRegister)
   });
+  const navigate = useNavigate();
   const RegisterAccountMutaion = useMutation({
     mutationKey: ["register"],
     mutationFn: (body: ILogin) => RegisterAccount(body)
   });
 
   const handleOnSubmit = handleSubmit((data) => {
+    console.log(data);
+
     const body = omit(data, ["confirm_password"]);
     RegisterAccountMutaion.mutate(body, {
       onSuccess: (res) => {
         saveToLocalStorage("access_token", res.data.data);
+        navigate(RouterPath.Login),
+          {
+            replace: true
+          };
       }
     });
   });
