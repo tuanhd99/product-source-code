@@ -296,3 +296,4 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+Backend/Authentication/.vs/Authentication/DesignTimeBuild/.dtbcache.v2

@@ -30,7 +30,7 @@ function Register() {
     RegisterAccountMutaion.mutate(body, {
       onSuccess: (res) => {
         saveToLocalStorage("access_token", res.data.data);
-        navigate(RouterPath.Login),
+        navigate(RouterPath.Index),
           {
             replace: true
           };

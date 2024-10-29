@@ -1,11 +1,12 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { RouterPath } from "src/routers/utils";
 import { schemaLogin, SchemaLogin } from "src/utils/validate";
 import { useMutation } from "@tanstack/react-query";
 import { LoginAccount } from "src/auth/auth.API";
 import { ILogin } from "src/auth/models";
+import { saveToLocalStorage } from "src/utils/function";
 function Login() {
   const {
     register,
@@ -14,6 +15,7 @@ function Login() {
   } = useForm<SchemaLogin>({
     resolver: yupResolver(schemaLogin)
   });
+  const navigate = useNavigate();
 
   const LoginAccountMutaion = useMutation({
     mutationKey: ["login"],
@@ -23,7 +25,11 @@ function Login() {
     LoginAccountMutaion.mutate(data, {
       onSuccess: (response) => {
         const { data } = response;
-        console.log(data);
+        saveToLocalStorage("access_token", data.data);
+        navigate(RouterPath.Index),
+          {
+            replace: true
+          };
       }
     });
   });
