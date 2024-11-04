@@ -4,6 +4,7 @@ import LoadingArea from "src/common/loading/LoadingArea";
 import LoginLayout from "src/layouts/LoginLayout/LoginLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import { RouterPath } from "./utils";
+import RestrictRoute from "./RestrictRoute";
 
 const Login = React.lazy(() => import("src/pages/Login"));
 const Register = React.lazy(() => import("src/pages/Register"));
@@ -35,7 +36,9 @@ export default function useRounteElement() {
           index: true,
           element: (
             <Suspense fallback={<LoadingArea />}>
-              <Login />
+              <RestrictRoute>
+                <Login />
+              </RestrictRoute>
             </Suspense>
           )
         }
@@ -49,7 +52,9 @@ export default function useRounteElement() {
           index: true,
           element: (
             <Suspense fallback={<LoadingArea />}>
-              <Register />
+              <RestrictRoute>
+                <Register />
+              </RestrictRoute>
             </Suspense>
           )
         }

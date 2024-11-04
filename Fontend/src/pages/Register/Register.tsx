@@ -1,12 +1,15 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
 import { omit } from "lodash";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import { RegisterAccount } from "src/auth/auth.API";
 import { ILogin } from "src/auth/models";
+import { AppContext } from "src/contexts/AppContext";
 import { RouterPath } from "src/routers/utils";
-import { saveToLocalStorage } from "src/utils/function";
+import { CustomStatusCode, saveToLocalStorage } from "src/utils/function";
 import { schemaRegister, SchemaRegister } from "src/utils/validate";
 
 function Register() {
@@ -17,23 +20,23 @@ function Register() {
   } = useForm<SchemaRegister>({
     resolver: yupResolver(schemaRegister)
   });
-  const navigate = useNavigate();
+  const { setIsAuthenticated } = useContext(AppContext);
   const RegisterAccountMutaion = useMutation({
     mutationKey: ["register"],
     mutationFn: (body: ILogin) => RegisterAccount(body)
   });
 
   const handleOnSubmit = handleSubmit((data) => {
-    console.log(data);
-
     const body = omit(data, ["confirm_password"]);
     RegisterAccountMutaion.mutate(body, {
-      onSuccess: (res) => {
-        saveToLocalStorage("access_token", res.data.data);
-        navigate(RouterPath.Index),
-          {
-            replace: true
-          };
+      onSuccess: (response) => {
+        const { data } = response;
+        if (data.code === CustomStatusCode.Ok && data.status === 0) {
+          saveToLocalStorage("access_token", data.data);
+          setIsAuthenticated(true);
+        } else {
+          toast.error(data.message);
+        }
       }
     });
   });

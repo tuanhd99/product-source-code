@@ -1,12 +1,15 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { RouterPath } from "src/routers/utils";
-import { schemaLogin, SchemaLogin } from "src/utils/validate";
 import { useMutation } from "@tanstack/react-query";
+import { useContext } from "react";
+import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import { LoginAccount } from "src/auth/auth.API";
 import { ILogin } from "src/auth/models";
-import { saveToLocalStorage } from "src/utils/function";
+import { AppContext } from "src/contexts/AppContext";
+import { RouterPath } from "src/routers/utils";
+import { CustomStatusCode, saveToLocalStorage } from "src/utils/function";
+import { schemaLogin, SchemaLogin } from "src/utils/validate";
 function Login() {
   const {
     register,
@@ -15,7 +18,7 @@ function Login() {
   } = useForm<SchemaLogin>({
     resolver: yupResolver(schemaLogin)
   });
-  const navigate = useNavigate();
+  const { setIsAuthenticated } = useContext(AppContext);
 
   const LoginAccountMutaion = useMutation({
     mutationKey: ["login"],
@@ -25,11 +28,12 @@ function Login() {
     LoginAccountMutaion.mutate(data, {
       onSuccess: (response) => {
         const { data } = response;
-        saveToLocalStorage("access_token", data.data);
-        navigate(RouterPath.Index),
-          {
-            replace: true
-          };
+        if (data.code === CustomStatusCode.Ok && data.status === 0) {
+          saveToLocalStorage("access_token", data.data);
+          setIsAuthenticated(true);
+        } else {
+          toast.error(data.message);
+        }
       }
     });
   });

@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import AppProvide from "./contexts/AppContext.tsx";
 import "./index.css";
+import { ToastContainer } from "react-toastify";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,6 +23,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <App />
         </AppProvide>
       </QueryClientProvider>
+      <ToastContainer />
     </BrowserRouter>
   </React.StrictMode>
 );
